@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/joint.min.css" />
+		<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/template.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/lodash.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/backbone.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/joint.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			.left {
+				float: left;
+				height: 100%;
+				width: 20%;
+			}
+			
+			html,
+			body,
+			#paper {
+				height: 100%;
+				width: 100%;
+			}
+			
+			#paper {
+				position: absolute;
+				top: 0;
+			}
+			
+			p {
+				margin: 50px 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div style="position: fixed;top: 0;z-index: 100000;font-weight: bold;" >
+				            <input type="text" class="talk_word" id="slots_input">
+            <input type="button" value="send" class="talk_sub" id="talksub2" onclick="click_send()">
+			</div>
+
+
+		<div id="paper" height= "80%">
+
+		</div>
+		<div class="box"></div>
+
+		<script type="text/javascript">
+		var graph = new joint.dia.Graph;
+
+			
+
+			var paper = new joint.dia.Paper({
+				el: $('#paper'),
+				width: 100 + '%',
+				height: 90 + '%',
+				gridSize: 1,
+				model: graph
+			});
+		
+		function click_send() {
+		// 获取输入框输入内容，有异常处理的.
+
+		var TalkWords = document.getElementById("slots_input");
+		var TalkSub = document.getElementById("talksub2");
+		console.log(TalkWords.value)
+		slots = TalkWords.value.split(" ")
+		req_url = "http://10.0.0.32:8000/agent/auto_fsm_by_slots"
+				  $.ajax({
+			url: req_url,
+					async: false,  // 同步，等待过程执行完毕;
+		//    async: true,
+			dataType: "json",
+			type: "post",
+			contentType: "application/json",
+			data: JSON.stringify({slot:TalkWords.value}),
+			processData: false,
+			success: function(rsp_data, textStatus, jQxhr) {
+			  console.log("请求成功");
+			  console.log(rsp_data);
+			  console.log(typeof(rsp_data));
+			  // write rsp data into textarea.
+			  rsp_json_results = JSON.stringify(rsp_data, undefined, 4);
+			  //alert(rsp_json_results)
+			  graph.clear()
+			  draw(rsp_data["state"],rsp_data["transition"])	  			  			  			  
+			  
+			 
+			},
+			error: function(jqXhr, textStatus, errorThrown) {
+			  console.log("请求失败");
+			  console.log(errorThrown);
+			}
+		  });
+		alert(TalkWords.value)
+		alert("ready to read the slot")
+		
+		}
+			function node(x, y, label, a, b) {
+
+				var cell = new joint.shapes.basic.Rect({
+					position: {
+						x: x,
+						y: y
+					},
+					size: {
+						width: label.length *14,
+						height: 50
+					},
+					attrs: {
+						rect: {
+							fill: '#000',
+							rx: 5,
+							ry: 5,
+							'stroke-width': 0
+						},
+						text: {
+							text: label,
+							'ref-x': .5,
+							'ref-y': .5,
+							fill: '#fff'
+						},
+					}
+				});
+
+				graph.addCell(cell);
+				$(a).click(function() {
+					window.open(b);
+				});
+				cell.toBack();
+				return cell;
+			};
+
+			function link(source, target, label, vertices) {
+
+				var cell = new joint.shapes.fsa.Arrow({
+					source: {
+						id: source.id
+					},
+					target: {
+						id: target.id
+					},
+					labels: [{
+						position: 0.5,
+						attrs: {
+							text: {
+								text: label || '',
+								'font-weight': 'bold'
+							}
+						}
+					}],
+					vertices: vertices || [],
+					attrs: ({
+						'.connection': {
+							stroke: '#333333', //连线颜色
+							'stroke-width': 4 //连线粗细
+						},
+						'.marker-target': {
+							fill: 'red',
+							d: 'M 10 0 L 0 5 L 10 10 z'
+						}
+					})
+				});
+				graph.addCell(cell);
+
+				cell.toBack()
+
+				return cell;
+			}
+
+			var data = [
+				[{
+					title: '订单1',
+					tolink: "",
+					edge_label: "0",
+					id: "1",
+					node_name: '订单2',
+					pox:500,
+					poy:400
+				}],
+				[{
+					title: '预售',
+					tolink: "1",
+					edge_label: "1",
+					id: "2",
+					node_name: '预售',
+					pox:100,
+					poy:300
+				}, {
+					title: '预售2',
+					tolink: "2",
+					
+					edge_label: "0",
+					id: "3",
+					node_name: '预售2',
+					pox:400,
+					poy:600
+				}],
+				[{
+					title: '采购清单',
+					tolink: "2",
+					edge_label: "3",
+					id: "4",
+					node_name: '采购清单',
+					pox:300,
+					poy:800
+				}]
+			]
+			
+			function draw(states,transitions){
+				//states.forEach(function(state) {node(500, 500, state); });
+				var len = states.length;
+				state_dict = []
+				for (i = 0; i < len; i++) {
+					  n = node(100+200*(i%2), 100+200*(i/2), states[i]);
+					  state_dict[ states[i]] = n
+				}
+				var len = transitions.length;
+				for (i = 0; i < len; i++) {
+					row = transitions[i]
+					console.log(row)
+					state1 = row[0]
+					state2 = row[1]
+					link(state_dict[state1],state_dict[state2], row[2]);
+				}
+			}
+			
+			req_url = "http://10.0.0.32:8000/agent/chart_data"
+		  <!-- $.ajax({ -->
+			<!-- url: req_url, -->
+					<!-- async: false,  // 同步，等待过程执行完毕; -->
+		<!-- //    async: true, -->
+			<!-- dataType: "json", -->
+			<!-- type: "post", -->
+			<!-- contentType: "application/json", -->
+			<!-- data: JSON.stringify({}), -->
+			<!-- processData: false, -->
+			<!-- success: function(rsp_data, textStatus, jQxhr) { -->
+			  <!-- console.log("请求成功"); -->
+			  <!-- console.log(rsp_data); -->
+			  <!-- console.log(typeof(rsp_data)); -->
+			  <!-- draw(rsp_data["state"],rsp_data["transition"]) -->
+			  <!-- // write rsp data into textarea. -->
+			  <!-- rsp_json_results = JSON.stringify(rsp_data, undefined, 4); -->
+			  			  			  			  			  
+			  
+			 
+			<!-- }, -->
+			<!-- error: function(jqXhr, textStatus, errorThrown) { -->
+			  <!-- console.log("请求失败"); -->
+			  <!-- console.log(errorThrown); -->
+			<!-- } -->
+		  <!-- }); -->
+		  
+		  
+
+			draw(["s1","s2","s3","s4","s5","s6","s7"],[["s1","s2","test link"]])
+			states = ["ask1","ask2","ask3"]
+			
+
+			
+			<!-- n1 =node(400, 500, "测试节点400，500") -->
+			<!-- n2 = node(500, 500, "节点500，500") -->
+			<!-- n3 = node(500, 600, "节点500，600") -->
+			<!-- n4 = node(500, 700, "节点500，700") -->
+			<!-- n5 = node(500, 700, "this is a english node") -->
+			<!-- console.log(n4) -->
+			<!-- link(n1,n2, "edeg_label"); -->
+
+							
+			
+			
+			//--->
+			//|
+			//|
+			//v
+			
+			console.log(data)
+			var arraylist = [];
+			<!-- $.each(data, function(index, item1) { -->
+				<!-- $(".box").append("<div class='left'></div>") -->
+				<!-- $.each(item1, function(index2, item2) { -->
+					<!-- $(".left").eq(index).append("<p id='" + item1[index2].id + "'>" + item1[index2].title + "</p>") -->
+					<!-- debugger -->
+					<!-- var id1 = item1[index2].id -->
+					<!-- var arrValue1 = arraylist[id1]; -->
+					<!-- var y = item1[index2].poy; -->
+					<!-- var x = item1[index2].pox; -->
+					<!-- var node_name = item1[index2].node_name -->
+					<!-- if(arrValue1 == undefined) { -->
+						<!-- arraylist[id1] = node(x, y, node_name); -->
+					<!-- } -->
+					<!-- if(item1[index2].tolink != "") { -->
+						<!-- var id2 = item1[index2].tolink -->
+						<!-- var arrValue2 = arraylist[id2]; -->
+						<!-- var y2 = $("#" + id2).offset().top; -->
+						<!-- var x2 = $("#" + id2).offset().left; -->
+						<!-- var edge_label = item1[index2].edge_label -->
+						<!-- if(arrValue2 == undefined) { -->
+							<!-- arraylist[id2] = node(x2, y2); -->
+						<!-- } -->
+						<!-- console.log(arraylist[id2]) -->
+						<!-- link(arraylist[id1], arraylist[id2], "edeg_label"); -->
+					<!-- } -->
+
+				<!-- }); -->
+
+			<!-- }); -->
+			
+			
+		</script>
+
+	</body>
+
+</html>

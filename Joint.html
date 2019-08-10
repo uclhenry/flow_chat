@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/joint.min.css" />
+		<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/template.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/lodash.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/backbone.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/joint.js" type="text/javascript" charset="utf-8"></script>
+
+		<style>
+			.clear {
+				clear: both;
+			}
+			
+			body,
+			html {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			
+			.box {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.department {
+				float: left;
+				border-right: 2px solid #000000;
+				width: 200px;
+				height: 800px;
+				position: relative;
+			}
+			
+			.departmentTop {
+				text-align: center;
+				border-bottom: 2px solid #000000;
+				font-size: 20px;
+			}
+			
+			.departmentnr {
+				text-align: center;
+				opacity: 0;
+			}
+			
+			.departmentnr a {
+				width: 100px;
+				height: 60px;
+				display: inline-block;
+				text-align: center;
+				line-height: 60px;
+				text-decoration: none;
+				background: cornflowerblue;
+				color: #000000;
+				margin-top: 20px;
+				font-size: 20px;
+				border-radius: 10px;
+			}
+			
+			#paper {
+				position: absolute;
+				top: 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div style="position: fixed;top: 0;z-index: 100000;font-weight: bold;" >原创作者来源<a href="https://blog.csdn.net/weixin_41916005" style="font-weight: 400;">https://blog.csdn.net/weixin_41916005</a></div>
+		<div class="box"></div>
+		<div id="paper"></div>
+		<script type="text/javascript">
+			var json = {
+				"Item": [{
+					"Department": "技术中心",
+					"DepartSort": 2,
+					"NavigatItem": [{
+						"Id": "66f48322cf334263a8b392ff14919781",
+						"Name": "打样",
+						"Url": "/q/mpic/20170731omsproofingnewhead",
+						"Department": "技术中心",
+						"Display": "款式打样",
+						"Childs": []
+					}]
+				}, {
+					"Department": "业务部",
+					"DepartSort": 3,
+					"NavigatItem": [{
+						"Id": "3200d59319e045ab934097a447066b74",
+						"Name": "款式",
+						"Url": "/q/mpic/20171019omsdesignnewhead",
+						"Department": "业务部",
+						"Display": "款式库，存储各种款式",
+						"Childs": [{
+							"Id": "1af1a2c431d946718ad1178df6b242c3",
+							"Name": "报价",
+							"Url": "",
+							"Department": "业务部",
+							"Display": "",
+							"Childs": [{
+								"Id": "477d085b884643d390c727fbfcc44a49",
+								"Name": "订单",
+								"Url": "",
+								"Department": "业务部",
+								"Display": "",
+								"Childs": [{
+									"Id": "594ba51357854f739171eb6bc36b00ea",
+									"Name": "加工",
+									"Url": "",
+									"Department": "业务部",
+									"Display": "",
+									"Childs": []
+								}, {
+									"Id": "8081fa7b8ff24a5cb5a3c2d8ee3eb877",
+									"Name": "储运",
+									"Url": "",
+									"Department": "储运部",
+									"Display": "",
+									"Childs": []
+								}, {
+									"Id": "8f9ba2fe379b404ab8a5020f9775fc86",
+									"Name": "预估",
+									"Url": "",
+									"Department": "业务部",
+									"Display": "",
+									"Childs": [{
+										"Id": "869117e2f5604a7d892e04b6a283dc92",
+										"Name": "采购",
+										"Url": "",
+										"Department": "开发采购部",
+										"Display": "",
+										"Childs": []
+									}]
+								}]
+							}]
+						}, {
+							"Id": "66f48322cf334263a8b392ff14919781",
+							"Name": "打样",
+							"Url": "/q/mpic/20170731omsproofingnewhead",
+							"Department": "技术中心",
+							"Display": "款式打样",
+							"Childs": []
+						}]
+					}, {
+						"Id": "1af1a2c431d946718ad1178df6b242c3",
+						"Name": "报价",
+						"Url": "",
+						"Department": "业务部",
+						"Display": "",
+						"Childs": [{
+							"Id": "477d085b884643d390c727fbfcc44a49",
+							"Name": "订单",
+							"Url": "",
+							"Department": "业务部",
+							"Display": "",
+							"Childs": [{
+								"Id": "594ba51357854f739171eb6bc36b00ea",
+								"Name": "加工",
+								"Url": "",
+								"Department": "业务部",
+								"Display": "",
+								"Childs": []
+							}, {
+								"Id": "8081fa7b8ff24a5cb5a3c2d8ee3eb877",
+								"Name": "储运",
+								"Url": "",
+								"Department": "储运部",
+								"Display": "",
+								"Childs": []
+							}, {
+								"Id": "8f9ba2fe379b404ab8a5020f9775fc86",
+								"Name": "预估",
+								"Url": "",
+								"Department": "业务部",
+								"Display": "",
+								"Childs": [{
+									"Id": "869117e2f5604a7d892e04b6a283dc92",
+									"Name": "采购",
+									"Url": "",
+									"Department": "开发采购部",
+									"Display": "",
+									"Childs": []
+								}]
+							}]
+						}]
+					}, {
+						"Id": "477d085b884643d390c727fbfcc44a49",
+						"Name": "订单",
+						"Url": "",
+						"Department": "业务部",
+						"Display": "",
+						"Childs": [{
+							"Id": "594ba51357854f739171eb6bc36b00ea",
+							"Name": "加工",
+							"Url": "",
+							"Department": "业务部",
+							"Display": "",
+							"Childs": []
+						}, {
+							"Id": "8081fa7b8ff24a5cb5a3c2d8ee3eb877",
+							"Name": "储运",
+							"Url": "",
+							"Department": "储运部",
+							"Display": "",
+							"Childs": []
+						}, {
+							"Id": "8f9ba2fe379b404ab8a5020f9775fc86",
+							"Name": "预估",
+							"Url": "",
+							"Department": "业务部",
+							"Display": "",
+							"Childs": [{
+								"Id": "869117e2f5604a7d892e04b6a283dc92",
+								"Name": "采购",
+								"Url": "",
+								"Department": "开发采购部",
+								"Display": "",
+								"Childs": []
+							}]
+						}]
+					}, {
+						"Id": "8f9ba2fe379b404ab8a5020f9775fc86",
+						"Name": "预估",
+						"Url": "",
+						"Department": "业务部",
+						"Display": "",
+						"Childs": [{
+							"Id": "869117e2f5604a7d892e04b6a283dc92",
+							"Name": "采购",
+							"Url": "",
+							"Department": "开发采购部",
+							"Display": "",
+							"Childs": []
+						}]
+					}, {
+						"Id": "594ba51357854f739171eb6bc36b00ea",
+						"Name": "加工",
+						"Url": "",
+						"Department": "业务部",
+						"Display": "",
+						"Childs": []
+					}, {
+						"Id": "a590ea95d3e34c0487e06a33514a9cbb",
+						"Name": "付款申请",
+						"Url": "",
+						"Department": "业务部",
+						"Display": "",
+						"Childs": []
+					}]
+				}, {
+					"Department": "开发采购部",
+					"DepartSort": 4,
+					"NavigatItem": [{
+						"Id": "869117e2f5604a7d892e04b6a283dc92",
+						"Name": "采购",
+						"Url": "",
+						"Department": "开发采购部",
+						"Display": "",
+						"Childs": []
+					}, {
+						"Id": "66a015f5f5a44b248a6c4a2ce8e4bbfb",
+						"Name": "付款申请",
+						"Url": "",
+						"Department": "开发采购部",
+						"Display": "",
+						"Childs": []
+					}]
+				}, {
+					"Department": "储运部",
+					"DepartSort": 5,
+					"NavigatItem": [{
+						"Id": "8081fa7b8ff24a5cb5a3c2d8ee3eb877",
+						"Name": "储运",
+						"Url": "",
+						"Department": "储运部",
+						"Display": "",
+						"Childs": []
+					}, {
+						"Id": "0b1281ca43634d1e87ccf1c803570a24",
+						"Name": "付款申请",
+						"Url": "",
+						"Department": "储运部",
+						"Display": "",
+						"Childs": []
+					}]
+				}, {
+					"Department": "财务部",
+					"DepartSort": 6,
+					"NavigatItem": [{
+						"Id": "7ac835496b1946bcbe46d5727a68a172",
+						"Name": "付款",
+						"Url": "",
+						"Department": "财务部",
+						"Display": "",
+						"Childs": []
+					}]
+				}]
+			}
+			var graph = new joint.dia.Graph;
+
+			var paper = new joint.dia.Paper({
+				el: $('#paper'),
+				width: 20000,
+				height: 20000,
+				gridSize: 1,
+				model: graph
+			});
+			//定义模块形状
+			function state(x, y, label, a, b) {
+				var cell = new joint.shapes.basic.Rect({
+					position: {
+						x: x,
+						y: y
+					}, //坐标
+					size: {
+						width: 100,
+						height: 50
+					}, //宽高
+					attrs: {
+						rect: {
+							fill: 'rgb(119, 177, 227)',
+							rx: 5,
+							ry: 5,
+							'stroke-width': 0
+						},
+						text: {
+							text: label,
+							'ref-x': .5,
+							'ref-y': .5,
+							fill: '#fff'
+						},
+					}
+					//rect为方形,circle为圆形，还有stroke：边框颜色
+				});
+				graph.addCell(cell);
+				$(a).click(function() {
+					window.open(b);
+				});
+				cell.toBack();
+				return cell;
+			};
+
+			function link(source, target, label, vertices){
+				var cell = new joint.shapes.fsa.Arrow({
+					source: {
+						id: source.id
+					},
+					target: {
+						id: target.id
+					},
+					labels: [{
+						position: 0.5,
+						attrs: {
+							text: {
+								text: label || '',
+								'font-weight': 'bold'
+							}
+						}
+					}],
+					router: {
+						name: 'orthogonal'
+					},
+					connector: {
+						name: 'jumpover'
+					},
+					vertices: vertices || [],
+					attrs: ({
+
+						'.marker-target': {
+							fill: 'red',
+							d: 'M 10 0 L 0 5 L 10 10 z'
+						}
+					})
+				});
+				graph.addCell(cell);
+
+				cell.toBack()
+
+				return cell;
+			}
+			paper.$el.css('pointer-events', 'none')
+				</script>
+				<script>
+			var html = ""
+			for(var i = 0; i < json.Item.length; i++) {
+				debugger
+				var html2 = ""
+				html += "<div class='department''><div class='departmentTop'><p>" + json.Item[i].Department + "</p></div>"
+				for(var o = 0; o < json.Item[i].NavigatItem.length; o++) {
+
+					html2 += "<div class='departmentnr'><a target='_blank' href='' id=" + json.Item[i].NavigatItem[o].Id + " title=" + json.Item[i].NavigatItem[o].Display + ">" + json.Item[i].NavigatItem[o].Name + "</a></div>"
+				}
+				html += html2 + "</div>"
+			}
+			$(".box").html(html)
+			var num = 100 / json.Item.length - 1 + '%'
+			var arraylist = [];
+			$(".department").css("width", num);
+			$.each(json.Item, function(index, item) {
+				var name = item
+				$.each(item.NavigatItem, function(index, item2) {
+
+					var id2 = item2.Id;
+					var name2 = item2.Name;
+					var y2 = $("#" + id2).offset().top;
+					var x2 = $("#" + id2).offset().left;
+					debugger
+					var arrValue2 = arraylist[id2];
+					if(arrValue2 == undefined) {
+						arraylist[id2] = state(x2, y2, name2);
+					}
+					if(item2.Childs.length > 0) {
+						$.each(item2.Childs, function(index, item3) {
+							var id3 = item3.Id;
+							var name3 = item3.Name;
+							var y3 = $("#" + id3).offset().top;
+							var x3 = $("#" + id3).offset().left;
+
+							var arrValue3 = arraylist[id3];
+							if(arrValue3 == undefined) {
+								arraylist[id3] = state(x3, y3, name3);
+							}
+
+							link(arraylist[id2], arraylist[id3]);
+						})
+					} else {
+						//						state(x2, y2, name2);
+					}
+
+				})
+			})
+		</script>
+	</body>
+
+</html>
