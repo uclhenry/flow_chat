@@ -20,8 +20,8 @@
 			html,
 			body,
 			#paper {
-				height: 100%;
-				width: 100%;
+				height: 2000px;
+				width: 1000px;
 			}
 			
 			#paper {
@@ -36,13 +36,24 @@
 	</head>
 
 	<body>
-	<div style="position: fixed;top: 0;z-index: 100000;font-weight: bold;" >原创作者来源<a href="https://blog.csdn.net/weixin_41916005" style="font-weight: 400;">https://blog.csdn.net/weixin_41916005</a></div>
-		<div id="paper">
+	<div style="position: fixed;top: 0;z-index: 100000;font-weight: bold;" >
+	<input type  = 'text' id = 'info'></input>
+	<button onclick='add_slots()' >add slots</button>
+	<button onclick='double_transition_policy()' >make_flow_chart</button>
+	<button onclick='add_one_state()' >add one state</button>
+	<button onclick='add_link()' value = 'hello'>add link</button>
+	<button onclick='show_link()' value = 'hello'>show_link</button>
+	<button onclick='show_cells()' value = 'hello'>show_cells</button>
+	
+	</div>
+		<div id="paper" width ='1000px' height = '2000px'>
 
 		</div>
 		<div class="box"></div>
 
 		<script type="text/javascript">
+		
+
 			var graph = new joint.dia.Graph;
 
 			var paper = new joint.dia.Paper({
@@ -88,6 +99,7 @@
 				return cell;
 			};
 
+			
 			function link(source, target, label, vertices) {
 
 				var cell = new joint.shapes.fsa.Arrow({
@@ -125,6 +137,44 @@
 				return cell;
 			}
 
+			function free_link(x_pos,y_pos,x_pos2,y_pos2, label, vertices) {
+
+				var cell = new joint.shapes.fsa.Arrow({
+					source: {
+						x: x_pos,
+						y: y_pos,
+					},
+					target: {
+						x: x_pos2,
+						y: y_pos2,
+					},
+					labels: [{
+						position: 0.5,
+						attrs: {
+							text: {
+								text: label || '',
+								'font-weight': 'bold'
+							}
+						}
+					}],
+					vertices: vertices || [],
+					attrs: ({
+						'.connection': {
+							stroke: '#333333', //连线颜色
+							'stroke-width': 4 //连线粗细
+						},
+						'.marker-target': {
+							fill: 'red',
+							d: 'M 10 0 L 0 5 L 10 10 z'
+						}
+					})
+				});
+				graph.addCell(cell);
+
+				cell.toBack()
+
+				return cell;
+			}
 			var data = [
 				[{
 					title: '订单',
@@ -154,39 +204,166 @@
 					name: '采购清单'
 				}]
 			]
+			function add_slots(){
 
-			console.log(data)
-			var arraylist = [];
-			$.each(data, function(index, item1) {
-				$(".box").append("<div class='left'></div>")
-
-				$.each(item1, function(index2, item2) {
-
-					$(".left").eq(index).append("<p id='" + item1[index2].id + "'>" + item1[index2].title + "</p>")
-					debugger
-					var id1 = item1[index2].id
-					var arrValue1 = arraylist[id1];
-					var y = $("#" + id1).offset().top;
-					var x = $("#" + id1).offset().left;
-					var name = item1[index2].name
-					if(arrValue1 == undefined) {
-						arraylist[id1] = shape(x, y, name);
+				t = document.getElementById("info").value.split(' ')
+				for (i in t){
+					slot = t[i]
+					x = i /2 * 100
+					y = i%2 * 100
+					shape(x, y, slot) 
+	
+				}
+			}
+			function double_transition_policy(){
+				slots = document.getElementById("info").value.split(' ')
+				unfilled = " 未填写"
+				filled = " 已填写"
+				transition = []
+				for (i in slots){
+					slot = slots[i]
+					cur_state = "start"
+					if (i >0)
+						cur_state = "ask " + slots[i-1]
+					d1 = {'trigger':  slot + unfilled, 'source':cur_state, 'dest': "ask "+slot}
+					d2 = {'trigger':  slot + filled , 'source':cur_state, 'dest': "no action"}
+					d3 = {'trigger':  slot + unfilled , 'source':"no action", 'dest': "ask "+slot}
+					transition.push(d1)
+					transition.push(d2)
+					transition.push(d3)
 					}
-					if(item1[index2].tolink != "") {
-						var id2 = item1[index2].tolink
-						var arrValue2 = arraylist[id2];
-						var y2 = $("#" + id2).offset().top;
-						var x2 = $("#" + id2).offset().left;
-						var state = item1[index2].state
-						if(arrValue2 == undefined) {
-							arraylist[id2] = shape(x2, y2);
+				d = {'trigger':  "all filled" , 'source': "ask " + slots[slots.length-1], 'dest': "end"}
+				transition.push(d)
+				console.log(transition)
+				nodes_dict = {}
+				y_level = 0
+				y_level2 = 0
+				y_incr = 250
+				y_base = 200
+				for (i in transition){
+					a_trans = transition[i]
+					if  ((a_trans.source in nodes_dict) == false) {
+						x = 400
+						y = y_level * y_incr + y_base
+						if(a_trans.source.indexOf("ask") != -1){
+							x = 100
+							y = y_level2 *y_incr + y_base
+							y_level2 +=1
+						}else{
+							y_level +=1
 						}
-						link(arraylist[id2], arraylist[id1], state);
+						
+						nodes_dict[a_trans.source] = shape(x, y , a_trans.source) 
+						
+					}
+					if  ((a_trans.dest in nodes_dict) == false) {
+						x = 400
+						y = y_level *y_incr + y_base
+						if(a_trans.dest.indexOf("ask") != -1){
+							x =100
+							y = y_level2 *y_incr + y_base
+							y_level2 +=1
+						}else{
+							y_level +=1
+						}
+						nodes_dict[a_trans.dest] = shape(x, y,  a_trans.dest) 
 					}
 
-				});
+					
+				}
+				for (i in transition){
+					a_trans = transition[i]
+					link(nodes_dict[a_trans.source],nodes_dict[a_trans.dest], a_trans.trigger)
+				}				
+				
+			}
+			function add_one_state(){
+			t = document.getElementById("info").value
+			shape(500, 500, t) 
+			}
+			function add_link(){
 
-			});
+				console.log('in')
+				//alert(document.getElementById("info"))
+				t = document.getElementById("info").value.split(' ')
+				for (i in t){
+					label = t[i]
+					x = i /2 * 100 + 100
+					y = i%2 * 100 + 100
+					free_link(x,y,x,y + 100 , label)
+
+				}
+			}
+			console.log(data)
+			<!-- var arraylist = []; -->
+			<!-- $.each(data, function(index, item1) { -->
+				<!-- $(".box").append("<div class='left'></div>") -->
+
+				<!-- $.each(item1, function(index2, item2) { -->
+
+					<!-- $(".left").eq(index).append("<p id='" + item1[index2].id + "'>" + item1[index2].title + "</p>") -->
+					
+					<!-- var id1 = item1[index2].id -->
+					<!-- var arrValue1 = arraylist[id1]; -->
+					<!-- var y = $("#" + id1).offset().top; -->
+					<!-- var x = $("#" + id1).offset().left; -->
+					<!-- var name = item1[index2].name -->
+					<!-- if(arrValue1 == undefined) { -->
+						<!-- arraylist[id1] = shape(x, y, name); -->
+					<!-- } -->
+					<!-- if(item1[index2].tolink != "") { -->
+						<!-- var id2 = item1[index2].tolink -->
+						<!-- var arrValue2 = arraylist[id2]; -->
+						<!-- var y2 = $("#" + id2).offset().top; -->
+						<!-- var x2 = $("#" + id2).offset().left; -->
+						<!-- var state = item1[index2].state -->
+						<!-- if(arrValue2 == undefined) { -->
+							<!-- arraylist[id2] = shape(x2, y2); -->
+						<!-- } -->
+						<!-- link(arraylist[id2], arraylist[id1], state); -->
+						<!-- console.log(arraylist[id2]) -->
+					<!-- } -->
+
+				<!-- }); -->
+
+			<!-- }); -->
+			//foreach i in [0,1,2,3]:
+			console.log(graph.getCells() )	
+			console.log('link' )	
+			console.log(graph.getLinks() )	
+			function show_link(){
+				for (x in graph.getLinks()) {
+				source_id = graph.getLinks()[x].attributes['source'].id 
+				target_id = graph.getLinks()[x].attributes['target'].id
+				source = get_element_by_id(source_id)
+				target = get_element_by_id(target_id)
+				console.log(source.attributes.attrs.text.text+'---\>' +target.attributes.attrs.text.text)
+				//console.log('---\>')
+				//console.log(graph.getLinks()[x].attributes['target'].id )
+				//console.log(graph.getLinks()[x].attributes['source'].toString() +'---\>' + graph.getLinks()[x].attributes['target'] )
+			
+			}}
+			
+			
+			function show_cells(){
+				for (x in graph.getElements()) {
+				console.log(graph.getElements()[x].attributes.attrs.text.text )
+				console.log(graph.getElements()[x].attributes.id )
+				
+			}}
+			function get_element_by_id(id){
+				for (x in graph.getElements()) {
+				e_id = graph.getElements()[x].attributes.id
+				if (id == e_id)
+				return graph.getElements()[x]
+
+				
+				}
+			}
+			//console.log(graph.getLinks()[0].attributes['source'])	
+			//console.log(graph.getLinks()[0].attributes['target'])	
+			//console.log(graph.getLinks()[0].attributes['id'])	
+			
 			
 		</script>
 
